@@ -17,14 +17,28 @@ class CreateCircle(Scene):
 
 class DrawCarousel(Scene):
     def construct(self):
-        base = Ellipse(height=2, width=6)
+        CAROUSEL_HEIGHT = 2
+        CAROUSEL_WIDTH = 6
 
-        arrow2 = Arc(radius=1, angle=PI/2).stretch_to_fit_height(1.2).stretch_to_fit_width(3.6).add_tip()
-        # arrow = ArcBetweenPoints(start=np.array((0.0, -2.1, 0.0)), end=np.array((3.1, -1.0, 0.0))).add_tip()
-        # movement = VGroup(base, arrow)
+        base = Ellipse(height=CAROUSEL_HEIGHT, width=CAROUSEL_WIDTH)
+        arrow2 = Arc(radius=1, angle=PI/2)
+        omega = MathTex("\omega")
 
+        arrow2.shift(DOWN).shift(RIGHT);
+        omega.align_to(arrow2).shift(3 * RIGHT)
+        base.shift(DOWN)
+    
+        base.set_fill(RED, opacity = 0.65)
 
-        self.play(Create(base.shift(DOWN)), Create(arrow2))
+        arrow2.stretch_to_fit_height(CAROUSEL_HEIGHT / 2)
+        arrow2.stretch_to_fit_width(CAROUSEL_WIDTH / 2)
+        arrow2.scale_to_fit_height(CAROUSEL_HEIGHT / 2 * 1.5)
+        arrow2.add_tip()
+
+        center = base.get_center;
+        
+
+        self.play(Create(base), Create(arrow2), Create(omega))
         self.wait()
         # self.play(movement.rotate(PI))
         # self.play(Create(arrow2))
