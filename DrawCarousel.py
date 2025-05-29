@@ -13,7 +13,7 @@ class DrawCarousel(Scene):
                 
         
         base.shift(DOWN)
-        arrow2.shift(DOWN).shift(RIGHT);
+        arrow2.shift(DOWN).shift(RIGHT)
         omega.align_to(arrow2).shift(3 * RIGHT)
     
         base.set_fill(RED, opacity = 0.25)
@@ -23,10 +23,10 @@ class DrawCarousel(Scene):
         arrow2.scale_to_fit_height(CAROUSEL_HEIGHT / 2 * 1.5)
         arrow2.add_tip()
 
-        center = base.get_center;
+        center = base.get_center
         
         # carousel lines 
-        num_sectors = 4 
+        num_sectors = 3 
         angles = [n * (180 / num_sectors) for n in range(num_sectors)]
         end_angles = [180 + angle for angle in angles]
 
@@ -42,9 +42,10 @@ class DrawCarousel(Scene):
 
         carousel = Group(base, *lines)
 
-        self.add(*lines)
-        self.play(Create(base), Create(arrow2), Create(omega))
-        self.play(Rotate(carousel, axis=Y_AXIS))
+        self.play(Create(base), Create(lines[1]), Create(lines[0]), Create(lines[2]))
+        # self.add(*lines)
+        self.wait()
+        self.play(Rotate(carousel, axis=np.array((1.0, -1.0, 1.0)), angle=PI/4, rate_functions=not_quite_there))
         self.wait()
         # self.play(movement.rotate(PI))
         # self.play(Create(arrow2))
