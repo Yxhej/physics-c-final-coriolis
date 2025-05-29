@@ -1,34 +1,22 @@
 from manim import *
-
-class CreateCircle(Scene):
-    def construct(self):
-        circle = Circle(radius=2)  # create a circle
-        circle.set_fill(PINK, opacity=0.5)  # set the color and transparency
-        t2 = MathTex(r"\frac{1}{a+b\sqrt{2}}")
-        f = Tex("F")
-
-        self.play(Create(circle.shift(LEFT)), run_time=2)  # show the circle on screen
-        self.wait()
-        self.play(Create(circle.center()), run_time=1)
-        self.wait()
-        self.play(Transform(circle.shift(RIGHT), f, replace_mobject_with_target_in_scene=True), run_time=2)
-        self.wait()
-        self.play(Transform(f, t2.shift_onto_screen()), run_time=4)
+from math import *
 
 class DrawCarousel(Scene):
     def construct(self):
         CAROUSEL_HEIGHT = 2
         CAROUSEL_WIDTH = 6
 
+        # x^2/3^2 + y^2/1 = 1
         base = Ellipse(height=CAROUSEL_HEIGHT, width=CAROUSEL_WIDTH)
         arrow2 = Arc(radius=1, angle=PI/2)
         omega = MathTex("\omega")
-
+                
+        
+        base.shift(DOWN)
         arrow2.shift(DOWN).shift(RIGHT);
         omega.align_to(arrow2).shift(3 * RIGHT)
-        base.shift(DOWN)
     
-        base.set_fill(RED, opacity = 0.65)
+        base.set_fill(RED, opacity = 0.25)
 
         arrow2.stretch_to_fit_height(CAROUSEL_HEIGHT / 2)
         arrow2.stretch_to_fit_width(CAROUSEL_WIDTH / 2)
@@ -37,8 +25,26 @@ class DrawCarousel(Scene):
 
         center = base.get_center;
         
+        # carousel lines 
+        num_sectors = 4 
+        angles = [n * (180 / num_sectors) for n in range(num_sectors)]
+        end_angles = [180 + angle for angle in angles]
 
+        points = [base.point_at_angle(np.radians(angle)) for angle in angles]
+        end_points = [base.point_at_angle(np.radians(angle)) for angle in end_angles]
+        
+        lines = []
+        for i in range(num_sectors):
+            start_point = points[i]
+            end_point = end_points[i]
+            line = Line(start_point, end_point, color=RED)
+            lines.append(line)
+
+        carousel = Group(base, *lines)
+
+        self.add(*lines)
         self.play(Create(base), Create(arrow2), Create(omega))
+        self.play(Rotate(carousel, axis=Y_AXIS))
         self.wait()
         # self.play(movement.rotate(PI))
         # self.play(Create(arrow2))
