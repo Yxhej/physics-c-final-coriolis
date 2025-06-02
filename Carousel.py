@@ -12,7 +12,6 @@ class DrawCarousel(Scene):
         arrow2 = Arc((CAROUSEL_HEIGHT + CAROUSEL_WIDTH) / 4 + 0.6, angle=PI/2)
         omega = MathTex("\omega")
                 
-        
         angled_base.shift(DOWN)
     
         angled_base.set_fill(RED, opacity = 0.25)
@@ -54,6 +53,7 @@ class DrawCarousel(Scene):
             start_point = points[i]
             end_point = end_points[i]
             line = Line(start_point, end_point, color=RED).set_opacity(0.8)
+            line.set_z_index(1)
             lines.append(line)
         
         top_carousel = Group(top_base, *lines)
@@ -62,6 +62,7 @@ class DrawCarousel(Scene):
         ball.align_to(top_base, DOWN)
         
         ball_linear_path = Line(start=ball.get_center(), end=end_points[0], color=ORANGE) #dash_length=0.1, dashed_ratio=0.5)
+        self.add(TracedPath(ball.get_bottom, stroke_width=6).set_color(ORANGE).set_z_index(0))
 
         # self.wait()
         # self.play(Rotate(angle_carousel, rate_func=smoothererstep))
@@ -71,11 +72,13 @@ class DrawCarousel(Scene):
         self.play(Create(arrow2), Create(omega), Create(ball))
         self.wait()
 
-        self.add(TracedPath(ball.get_center).set_color(ORANGE))
-        self.play(LaggedStart(
-            Rotate(top_carousel, angle=TAU, rate_func=linear), 
-            MoveAlongPath(ball, ball_linear_path),
-            lag_ratio=0.4,
-            run_time=3,
-            rate_func=linear))
-        
+        self.play(
+            LaggedStart(
+                Rotate(top_carousel, angle=TAU, rate_func=linear), 
+                MoveAlongPath(ball, ball_linear_path),
+                lag_ratio=0.4,
+                run_time=3,
+                rate_func=linear),                                      # run_time = 10, lessened for < wait
+            Rotate(top_carousel, angle=e*TAU, 
+                   rate_func=rate_functions.ease_out_sine, 
+                   run_time=2*e))
