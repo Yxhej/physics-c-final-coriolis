@@ -70,5 +70,9 @@ class DrawCarousel(Scene):
         self.wait()
         self.play(Create(arrow2), Create(omega), Create(ball))
         self.wait()
-        self.play(Rotate(top_carousel, angle=TAU, run_time=3), FadeIn(ball_linear_path), TracedPath(ball.get_center), rate_func=linear)
+        self.play(LaggedStart(
+            Rotate(top_carousel, angle=TAU, ), 
+            TracedPath(ball.get_center),
+            lag_ratio=0.4,
+            rate_func=linear))
         
