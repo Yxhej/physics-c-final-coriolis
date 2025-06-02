@@ -53,7 +53,7 @@ class DrawCarousel(Scene):
         for i in range(num_sectors):
             start_point = points[i]
             end_point = end_points[i]
-            line = Line(start_point, end_point, color=RED)
+            line = Line(start_point, end_point, color=RED).set_opacity(0.8)
             lines.append(line)
         
         top_carousel = Group(top_base, *lines)
@@ -70,9 +70,12 @@ class DrawCarousel(Scene):
         self.wait()
         self.play(Create(arrow2), Create(omega), Create(ball))
         self.wait()
+
+        self.add(TracedPath(ball.get_center).set_color(ORANGE))
         self.play(LaggedStart(
-            Rotate(top_carousel, angle=TAU, ), 
-            TracedPath(ball.get_center),
+            Rotate(top_carousel, angle=TAU, rate_func=linear), 
+            MoveAlongPath(ball, ball_linear_path),
             lag_ratio=0.4,
+            run_time=3,
             rate_func=linear))
         
