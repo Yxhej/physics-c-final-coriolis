@@ -18,7 +18,7 @@ class DrawCarousel(Scene):
         angled_base.set_fill(RED, opacity = 0.25)
         top_base.set_fill(RED, opacity = 0.25)
 
-        arrow2.align_to(top_base, RIGHT)
+        arrow2.align_to(top_base, RIGHT).shift(RIGHT)
         arrow2.add_tip()
         omega.align_to(arrow2, UP + RIGHT)
 
@@ -38,8 +38,8 @@ class DrawCarousel(Scene):
             lines.append(line)
 
         ########################################################
-        angle_carousel = Group(angled_base, *lines)
-        self.play(Create(angled_base), Create(lines[1]), Create(lines[0]), Create(lines[2]))
+        # angle_carousel = Group(angled_base, *lines)
+        # self.play(Create(angled_base), Create(lines[1]), Create(lines[0]), Create(lines[2]))
         #########################################################
 
         # top-down carousel
@@ -58,10 +58,19 @@ class DrawCarousel(Scene):
         
         top_carousel = Group(top_base, *lines)
 
-        self.wait()
-        self.play(Rotate(angle_carousel, rate_func=smoothererstep))
-        self.play(Transform(angle_carousel, top_carousel, replace_mobject_with_target_in_scene=True))
-        self.wait(2)
-        self.play(Create(arrow2), Create(omega))
+        ball = Circle(radius=0.2)
 
-        self.play(Rotate(top_carousel, angle=3*TAU, run_time=10, rate_func=linear))
+        ball.set_fill(ORANGE, opacity=1)
+        ball.align_to(top_base, DOWN)
+        
+        ball_linear_path = DashedLine(start=ball.get_center(), end=end_points[2], color=ORANGE, dash_length=0.1, dashed_ratio=0.5)
+
+        # self.wait()
+        # self.play(Rotate(angle_carousel, rate_func=smoothererstep))
+        # self.play(Transform(angle_carousel, top_carousel, replace_mobject_with_target_in_scene=True))
+        # self.wait(2)
+        self.play(Create(arrow2), Create(omega), Create(ball))
+
+        self.play(Rotate(top_carousel, angle=TAU, run_time=3, rate_func=linear), Create(ball_linear_path), MoveAlongPath(mobject=ball, path=ball_linear_path))
+
+
