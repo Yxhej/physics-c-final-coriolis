@@ -9,7 +9,7 @@ class DrawCarousel(Scene):
         # x^2/3^2 + y^2/1 = 1
         angled_base = Ellipse(height=CAROUSEL_HEIGHT, width=CAROUSEL_WIDTH)
         top_base = Circle(radius= (CAROUSEL_HEIGHT + CAROUSEL_WIDTH) / 4)
-        arrow2 = Arc((CAROUSEL_HEIGHT + CAROUSEL_WIDTH) / 4 + 0.6, angle=PI/2)
+        arrow = Arc((CAROUSEL_HEIGHT + CAROUSEL_WIDTH) / 4 + 0.6, angle=PI/2)
         omega = MathTex("\omega")
                 
         angled_base.shift(DOWN)
@@ -17,9 +17,9 @@ class DrawCarousel(Scene):
         angled_base.set_fill(RED, opacity = 0.25)
         top_base.set_fill(RED, opacity = 0.25)
 
-        arrow2.align_to(top_base, RIGHT).shift(RIGHT)
-        arrow2.add_tip()
-        omega.align_to(arrow2, UP + RIGHT)
+        arrow.align_to(top_base, RIGHT).shift(RIGHT)
+        arrow.add_tip()
+        omega.align_to(arrow, UP + RIGHT)
 
         # angle carousel lines 
         num_sectors = 3 
@@ -62,37 +62,39 @@ class DrawCarousel(Scene):
         ball = Dot(radius=0.2).set_color(ORANGE)
         ball.align_to(top_base, DOWN)
         
-        ref_ball_right = Dot(radius=0.2).set_color(ORANGE).shift(4*RIGHT)
-        ref_ball_left = Dot(radius=0.2).set_color(ORANGE).shift(4*LEFT)
-        ref_text = Tex("Rotational\\\\Reference")
-
-        ref_text.align_to(ref_ball_right, DOWN)
+        ref_ball_right = Dot(radius=0.2).set_color(WHITE).shift(4*RIGHT)
+        ref_ball_left = Dot(radius=0.2).set_color(WHITE).shift(4*LEFT)
+        ref_text = Tex("Rotational\\\\Reference").shift(4*RIGHT + DOWN)
 
         ball_linear_path = Line(start=ball.get_center(), end=end_points[0], color=ORANGE) #dash_length=0.1, dashed_ratio=0.5)
+        ball_radial_path = ArcBetweenPoints(start=ball.get_center(), end=end_points[0], color=ORANGE)
 
         # self.wait()
         # self.play(Rotate(angle_carousel, rate_func=smoothererstep))
         self.wait()
         self.play(Transform(angle_carousel, top_carousel, replace_mobject_with_target_in_scene=True))
         self.wait()
-        self.play(Create(arrow2), Create(omega), Create(ball))
+        self.play(Create(arrow), Create(omega), Create(ball))
         self.wait()
         self.play(Create(ref_ball_right), Create(ref_ball_left), FadeIn(ref_text))
-        self.wait()
+        self.wait(2)
         self.play(FadeOut(ref_text))
+        self.wait()
 
-        self.add(TracedPath(ball.get_bottom, stroke_width=6).set_color(ORANGE))
+
+        self.add(TracedPath(ball.get_bottom, stroke_width=6, dissipating_time=2).set_color(ORANGE))
 
         self.play(
             LaggedStart(
-                Rotate(top_carousel, angle=TAU, rate_func=linear), 
+                Rotate(top_carousel, angle=PI*1.6, rate_func=linear), 
                 MoveAlongPath(ball, ball_linear_path),
                 lag_ratio=0.4,
                 run_time=3,
                 rate_func=linear),                                      # run_time = 10, lessened for < wait
-            Rotate(top_carousel, angle=e*TAU, 
+            Rotate(top_carousel, angle=e*PI*1.6, 
                    rate_func=rate_functions.ease_out_sine, 
-                   run_time=2*e))
+                   run_time=2*e),
+            FadeOut(arrow, omega))
 
         # self.play(
         #     LaggedStart(
