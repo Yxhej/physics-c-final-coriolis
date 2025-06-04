@@ -41,7 +41,7 @@ class DrawCarousel(Scene):
         self.play(Create(angled_base), Create(lines[1]), Create(lines[0]), Create(lines[2]))
         #########################################################
 
-        # top-down carousel
+        # top-down carousel circle lines
         angles = [n * (180 / num_sectors) for n in range(num_sectors)]
         end_angles = [180 + angle for angle in angles]
 
@@ -49,6 +49,7 @@ class DrawCarousel(Scene):
         end_points = [top_base.point_at_angle(np.radians(angle)) for angle in end_angles]
         
         lines = []
+
         for i in range(num_sectors):
             start_point = points[i]
             end_point = end_points[i]
@@ -61,8 +62,13 @@ class DrawCarousel(Scene):
         ball = Dot(radius=0.2).set_color(ORANGE)
         ball.align_to(top_base, DOWN)
         
+        ref_ball_right = Dot(radius=0.2).set_color(ORANGE).shift(4*RIGHT)
+        ref_ball_left = Dot(radius=0.2).set_color(ORANGE).shift(4*LEFT)
+        ref_text = Tex("Rotational\\\\Reference")
+
+        ref_text.align_to(ref_ball_right, DOWN)
+
         ball_linear_path = Line(start=ball.get_center(), end=end_points[0], color=ORANGE) #dash_length=0.1, dashed_ratio=0.5)
-        self.add(TracedPath(ball.get_bottom, stroke_width=6).set_color(ORANGE).set_z_index(0))
 
         # self.wait()
         # self.play(Rotate(angle_carousel, rate_func=smoothererstep))
@@ -71,6 +77,11 @@ class DrawCarousel(Scene):
         self.wait()
         self.play(Create(arrow2), Create(omega), Create(ball))
         self.wait()
+        self.play(Create(ref_ball_right), Create(ref_ball_left), FadeIn(ref_text))
+        self.wait()
+        self.play(FadeOut(ref_text))
+
+        self.add(TracedPath(ball.get_bottom, stroke_width=6).set_color(ORANGE))
 
         self.play(
             LaggedStart(
@@ -82,3 +93,14 @@ class DrawCarousel(Scene):
             Rotate(top_carousel, angle=e*TAU, 
                    rate_func=rate_functions.ease_out_sine, 
                    run_time=2*e))
+
+        # self.play(
+        #     LaggedStart(
+        #         Rotate(top_carousel, angle=TAU, rate_func=linear), 
+        #         MoveAlongPath(ball, ball_linear_path),
+        #         lag_ratio=0.4,
+        #         run_time=3,
+        #         rate_func=linear),                                      # run_time = 10, lessened for < wait
+        #     Rotate(top_carousel, angle=e*TAU, 
+        #            rate_func=rate_functions.ease_out_sine, 
+        #            run_time=2*e))
