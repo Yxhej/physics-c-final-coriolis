@@ -6,47 +6,24 @@ class DrawCarousel(Scene):
         CAROUSEL_HEIGHT = 2
         CAROUSEL_WIDTH = 6
 
-        # x^2/3^2 + y^2/1 = 1
-        angled_base = Ellipse(height=CAROUSEL_HEIGHT, width=CAROUSEL_WIDTH)
-        top_base = Circle(radius= (CAROUSEL_HEIGHT + CAROUSEL_WIDTH) / 4)
+        carousel = Circle(radius=(CAROUSEL_HEIGHT + CAROUSEL_WIDTH) / 4)
         arrow = Arc((CAROUSEL_HEIGHT + CAROUSEL_WIDTH) / 4 + 0.6, angle=PI/2)
         omega = MathTex("\omega")
                 
-        angled_base.shift(DOWN)
-    
-        angled_base.set_fill(RED, opacity = 0.25)
-        top_base.set_fill(RED, opacity = 0.25)
+        carousel.set_fill(RED, opacity = 0.25)
 
-        arrow.align_to(top_base, RIGHT).shift(RIGHT)
+        arrow.align_to(carousel, RIGHT).shift(RIGHT)
         arrow.add_tip()
         omega.align_to(arrow, UP + RIGHT)
 
-        # angle carousel lines 
+        # carousel circle lines
         num_sectors = 3 
-        angles = [n * (180 / num_sectors) for n in range(num_sectors)]
-        end_angles = [180 + angle for angle in angles]
-
-        points = [angled_base.point_at_angle(np.radians(angle)) for angle in angles]
-        end_points = [angled_base.point_at_angle(np.radians(angle)) for angle in end_angles]
         
-        lines = []
-        for i in range(num_sectors):
-            start_point = points[i]
-            end_point = end_points[i]
-            line = Line(start_point, end_point, color=RED)
-            lines.append(line)
-
-        ########################################################
-        angle_carousel = Group(angled_base, *lines)
-        self.play(Create(angled_base), Create(lines[1]), Create(lines[0]), Create(lines[2]))
-        #########################################################
-
-        # top-down carousel circle lines
         angles = [n * (180 / num_sectors) for n in range(num_sectors)]
         end_angles = [180 + angle for angle in angles]
 
-        points = [top_base.point_at_angle(np.radians(angle)) for angle in angles]
-        end_points = [top_base.point_at_angle(np.radians(angle)) for angle in end_angles]
+        points = [carousel.point_at_angle(np.radians(angle)) for angle in angles]
+        end_points = [carousel.point_at_angle(np.radians(angle)) for angle in end_angles]
         
         lines = []
 
@@ -57,23 +34,22 @@ class DrawCarousel(Scene):
             line.set_z_index(1)
             lines.append(line)
         
-        top_carousel = Group(top_base, *lines)
+        top_carousel = Group(carousel, *lines)
 
         ball = Dot(radius=0.2).set_color(ORANGE)
-        ball.align_to(top_base, DOWN)
+        ball.align_to(carousel, DOWN)
         
-        ref_ball_right = Dot(radius=0.2).set_color(WHITE).shift(4*RIGHT)
-        ref_ball_left = Dot(radius=0.2).set_color(WHITE).shift(4*LEFT)
-        ref_text = Tex("Rotational\\\\Reference").shift(4*RIGHT + DOWN)
-
-        ball_linear_path = Line(start=ball.get_center(), end=end_points[0], color=ORANGE) #dash_length=0.1, dashed_ratio=0.5)
-        ball_radial_path = ArcBetweenPoints(start=ball.get_center(), end=end_points[0], color=ORANGE)
-
-        # self.wait()
-        # self.play(Rotate(angle_carousel, rate_func=smoothererstep))
-        self.wait()
-        self.play(Transform(angle_carousel, top_carousel, replace_mobject_with_target_in_scene=True))
-        self.wait()
+        # i hate this
+        ball2 = Dot(radius=0.2).set_color(ORANGE)
+        ball2.align_to(carousel, DOWN)
+        
+        ref_ball_right = Dot(radius=0.2).set_color(WHITE).shift(2.5*RIGHT)
+        ref_ball_left = Dot(radius=0.2).set_color(WHITE).shift(2.5*LEFT)
+        ref_text = Tex("Rotational\\\\Reference").shift(3.5*LEFT + DOWN)
+        
+        
+        ########## Non-rotating reference frame, linear
+        self.play(Create(carousel), Create(lines[1]), Create(lines[0]), Create(lines[2]))
         self.play(Create(arrow), Create(omega), Create(ball))
         self.wait()
         self.play(Create(ref_ball_right), Create(ref_ball_left), FadeIn(ref_text))
@@ -83,26 +59,44 @@ class DrawCarousel(Scene):
 
 
         self.add(TracedPath(ball.get_bottom, stroke_width=6, dissipating_time=2).set_color(ORANGE))
-
+        
+        ball_linear_path = Line(start=ball.get_center(), end=points[0], color=ORANGE)
+        not_rotating = Tex("Non-rotating Reference Frame").shift(3*UP)
+        
+        self.play(Create(not_rotating))
         self.play(
             LaggedStart(
                 Rotate(top_carousel, angle=PI*1.6, rate_func=linear), 
                 MoveAlongPath(ball, ball_linear_path),
                 lag_ratio=0.4,
                 run_time=3,
-                rate_func=linear),                                      # run_time = 10, lessened for < wait
+                rate_func=linear),
             Rotate(top_carousel, angle=e*PI*1.6, 
                    rate_func=rate_functions.ease_out_sine, 
                    run_time=2*e),
             FadeOut(arrow, omega))
+        
+        self.play(FadeOut(ball), FadeOut(not_rotating))
+        self.remove(ball)
 
-        # self.play(
-        #     LaggedStart(
-        #         Rotate(top_carousel, angle=TAU, rate_func=linear), 
-        #         MoveAlongPath(ball, ball_linear_path),
-        #         lag_ratio=0.4,
-        #         run_time=3,
-        #         rate_func=linear),                                      # run_time = 10, lessened for < wait
-        #     Rotate(top_carousel, angle=e*TAU, 
-        #            rate_func=rate_functions.ease_out_sine, 
-        #            run_time=2*e))
+        self.wait(0.5)
+        
+        ########## Rotating reference frame, curved deflection
+        self.play(FadeIn(ball2))
+        self.add(TracedPath(ball2.get_bottom, stroke_width=6, dissipating_time=2).set_color(ORANGE))
+
+        rotating = Tex("Rotating Reference Frame").shift(3*UP)
+        rotating_references = Group(ref_ball_left, ref_ball_right)
+        ball_radial_path = ArcBetweenPoints(start=ball2.get_center(), end=points[0], angle=-TAU/4, color=ORANGE)
+
+        self.play(Create(rotating))
+        self.play(
+            LaggedStart(
+                Rotate(rotating_references, angle=TAU, rate_func=linear), 
+                MoveAlongPath(ball2, ball_radial_path),
+                lag_ratio=0.4,
+                run_time=3,
+                rate_func=linear),
+            Rotate(rotating_references, angle=e*TAU, 
+                   rate_func=rate_functions.ease_out_sine, 
+                   run_time=2*e))
