@@ -27,13 +27,13 @@ class Introduction(Scene):
         self.play(FadeIn(coriolis_force))
         
         wow = VGroup(coriolis_effect, coriolis_force, arrow)
+                
+        self.play(ReplacementTransform(wow, coriolis_force))
         
         coriolis_force.generate_target()
         coriolis_force.target.shift(0.75*UP)
-        
-        self.play(ReplacementTransform(wow, coriolis_force), MoveToTarget(coriolis_force))
-        self.wait()
-        
+
+
         ##### equation #######
         eq = MathTex(
             r"\vec{F}_{\text{cor}}", "=", r"-2m", r"(", r"\vec{\Omega}", r"\times", r"\vec{v}", r")",
@@ -53,4 +53,37 @@ class Introduction(Scene):
         )
 
         self.play(ReplacementTransform(coriolis_force, coriolis_force_eq), Write(eq), Write(labels))
-        self.wait(1)
+        self.wait(0.5)
+        
+        self.play(RemoveTextLetterByLetter(coriolis_force_eq), RemoveTextLetterByLetter(labels),RemoveTextLetterByLetter(eq), run_time=0.5)
+        self.wait(0.5)
+                
+                
+        fictitious = Tex("Ficticious Force").shift(UP)
+        line = Line(2*LEFT, 2*RIGHT).next_to(fictitious, DOWN)
+        coriolis = Tex("Coriolis Force + Centrifugal Force").next_to(line, DOWN)
+        
+        self.play(Create(fictitious))
+        self.add(line)
+        self.play(Create(coriolis), run_time=3)
+
+        forces = VGroup(fictitious, line, coriolis)
+        
+        self.play(forces.animate.shift(1.5*UP).scale(0.9))
+
+        
+        dot = Dot()
+        deflection = ArcBetweenPoints(ORIGIN, UP+RIGHT).set_color(GREEN)
+        rotation_arrow = Arc(start_angle=TAU/12, angle=TAU-TAU/4).scale(0.15).add_tip(tip_width=0.1, tip_length=0.1)
+        omega = MathTex("\omega").next_to(rotation_arrow, 0.25*(UP+LEFT)).scale(0.7)
+
+
+        display = VGroup(dot, deflection, rotation_arrow, omega).shift(DOWN)
+        display.scale(2)
+        
+        self.play(Create(dot))
+        self.play(Create(deflection))
+        self.wait(2.5)
+        self.play(Create(rotation_arrow), Create(omega))
+        
+        
