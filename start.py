@@ -52,8 +52,8 @@ class Introduction(Scene):
             Text("Object Velocity", font_size=28, color=GREEN).next_to(eq[6], DOWN),
         )
 
-        self.play(ReplacementTransform(coriolis_force, coriolis_force_eq), Write(eq), Write(labels))
-        self.wait(0.5)
+        self.play(ReplacementTransform(coriolis_force, coriolis_force_eq), Write(eq), Write(labels), run_time=1)
+        self.wait(1)
         
         self.play(RemoveTextLetterByLetter(coriolis_force_eq), RemoveTextLetterByLetter(labels),RemoveTextLetterByLetter(eq), run_time=0.5)
         self.wait(0.5)
@@ -63,12 +63,12 @@ class Introduction(Scene):
         line = Line(2*LEFT, 2*RIGHT).next_to(fictitious, DOWN)
         coriolis = Tex("Coriolis Force + Centrifugal Force").next_to(line, DOWN)
         
-        self.play(Create(fictitious))
+        self.play(Create(fictitious), run_time=0.5)
         self.add(line)
-        self.play(Create(coriolis), run_time=3)
+        self.play(Create(coriolis), run_time=1.5)
 
         forces = VGroup(fictitious, line, coriolis)
-        
+        self.wait(0.5)
         self.play(forces.animate.shift(1.5*UP).scale(0.9))
 
         
