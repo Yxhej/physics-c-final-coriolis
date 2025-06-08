@@ -92,8 +92,8 @@ class DrawCarousel(Scene):
             LaggedStart(
                 Rotate(top_carousel, angle=PI*1.6, rate_func=linear), 
                 MoveAlongPath(ball, ball_linear_path),
-                lag_ratio=0.4,
-                run_time=3,
+                lag_ratio=0.5,
+                run_time=4,
                 rate_func=linear),
             Rotate(top_carousel, angle=e*PI*1.6, 
                    rate_func=rate_functions.ease_out_sine, 

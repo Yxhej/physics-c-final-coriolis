@@ -22,7 +22,6 @@ class Introduction(Scene):
         arrow = Line(UP, DOWN).add_tip()
         
         self.play(MoveToTarget(coriolis_effect))
-        self.wait(1)
         self.play(FadeIn(arrow))
         self.play(FadeIn(coriolis_force))
         
@@ -53,7 +52,7 @@ class Introduction(Scene):
         )
 
         self.play(ReplacementTransform(coriolis_force, coriolis_force_eq), Write(eq), Write(labels), run_time=1)
-        self.wait(1)
+        self.wait(1.5)
         
         self.play(RemoveTextLetterByLetter(coriolis_force_eq), RemoveTextLetterByLetter(labels),RemoveTextLetterByLetter(eq), run_time=0.5)
         self.wait(0.5)
@@ -65,7 +64,7 @@ class Introduction(Scene):
         
         self.play(Create(fictitious), run_time=0.5)
         self.add(line)
-        self.play(Create(coriolis), run_time=1.5)
+        self.play(Create(coriolis), run_time=2)
 
         forces = VGroup(fictitious, line, coriolis)
         self.wait(0.5)
